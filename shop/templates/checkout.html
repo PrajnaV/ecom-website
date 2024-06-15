@@ -1,0 +1,173 @@
+{% extends 'basic.html' %} 
+{% block title%} Ecom-checkout{% endblock %} 
+{% block css %} 
+.form-field{ 
+    width:250px; 
+    display:inline-block; 
+    padding:5px; 
+}
+.box-element{ 
+    box-shadow: hsl(0, 0%, 80%) 0 0 16px; 
+    margin: auto;
+    margin-top:30px; 
+    padding: 20px; 
+} 
+.cart-row{ 
+    display:flex;
+    align-items:flex-stretch; 
+    padding-bottom:10px; 
+    margin-bottom:10px;
+    border-bottom:1px solid grey; 
+} 
+.hidden { 
+    display: none; 
+} 
+{% endblock %} 
+{% block body %}
+<div class="row">
+  <div class="col-lg-6">
+    <div class="box-element" id="form-wrapper">
+      <form id="form">
+        
+        <div id="shipping-info">
+          <hr />
+          <p>Shipping Information:</p>
+          <hr />
+          <div class="form-field">
+            <input
+              class="form-control"
+              type="text"
+              name="address"
+              placeholder="Address.."
+            />
+          </div>
+          <div class="form-field">
+            <input
+              class="form-control"
+              type="text"
+              name="city"
+              placeholder="City.."
+            />
+          </div>
+          <div class="form-field">
+            <input
+              class="form-control"
+              type="text"
+              name="state"
+              placeholder="State.."
+            />
+          </div>
+         
+          <div class="form-field">
+            <input
+              class="form-control"
+              type="text"
+              name="zipcode"
+              placeholder="Pin code.."
+            />
+          </div>
+        </div>
+
+        <hr />
+        <div class="d-grid gap-2">
+          <input
+            id="form-button"
+            class="btn btn-success"
+            type="submit"
+            value="Continue"
+          />
+        </div>
+      </form>
+    </div>
+    <br />
+    <div class="box-element hidden" id="payment-info">
+      <small>Paypal Options</small>
+      <button id="make-payment">Make Payment</button>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="box-element">
+      <a class="btn btn-outline-dark" href="{% url 'cart' %}"
+        >&#x2190; Back to Cart</a
+      >
+      <hr />
+      <h3>Order Summary</h3>
+      <hr />
+      <!--product details-->
+      {% for item in items %}
+      <div class="cart-row">
+        <div style="flex: 2">
+          <img
+            style="width: 100px; height: 100px"
+            class="row-image"
+            src="/media/{{item.product.image}}"
+          />
+        </div>
+        <div style="flex: 2"><p>{{item.product.title}}</p></div>
+        <div style="flex: 1"><p>Rs.{{item.product.price}}</p></div>
+        <div style="flex: 1"><p>x{{item.quantity}}</p></div>
+      </div>
+      {% endfor %}
+      <h5>Items: {{order.get_cart_quantity}}</h5>
+      <h5>Total: Rs.{{order.get_cart_total}}</h5>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block js %}
+<script type="text/javascript">
+  //to hide continue button once the form is submitted and show payment options
+  var form = document.getElementById("form");
+  
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); //prevents the form from getting submitted
+    console.log("Form submitted..");
+    document.getElementById("form-button").classList.add("hidden"); //hides the continue button
+    document.getElementById("payment-info").classList.remove("hidden"); //shows the payment options
+  });
+  document
+    .getElementById("make-payment")
+    .addEventListener("click", function (e) {
+      submitFormData();
+    });
+  function submitFormData() {
+    console.log("Payment button clicked");
+
+    
+    var shippingInfo = {
+      address: null,
+      city: null,
+      state: null,
+      zipcode: null,
+    };
+    shippingInfo.address = form.address.value;
+    shippingInfo.city = form.city.value;
+    shippingInfo.state = form.state.value;
+    shippingInfo.zipcode = form.zipcode.value;
+
+    
+
+    var url = "/shop/process_order/";
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ 'shipping': shippingInfo }),
+    })
+      //if data is successfully sent
+      .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+      .then((data) => {
+        console.log("Success:", data);
+        alert("Transaction completed");
+        window.location.href = "/shop/"; //users will be redirected to home page after the completion
+      });
+  }
+</script>
+{% endblock %}

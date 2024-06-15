@@ -1,0 +1,68 @@
+{% extends 'basic.html' %}
+{% block title%} Ecom{% endblock %} 
+{% block css %}
+    .card{ 
+        margin:auto; 
+        margin-top:50px;
+        box-shadow: 3px 5px 9px 3px rgba(0, 0, 0,0.35); 
+        border-radius: 20px; 
+        padding: 10px; 
+         
+        text-align: center;
+        width: 350px; 
+        height:360px; 
+        background-color: white; 
+        
+    } 
+    .card-img-top{
+        height:55%;
+        width:70%;
+        margin:auto;
+    }
+{% endblock %} 
+{% block body %}
+<!--displaying products-->
+{% for product in products %}
+<div class="card" style="width: 18rem">
+  <img src="/media/{{product.image}}" class="card-img-top" alt="..." />
+  <div class="card-body">
+    <h5 class="card-title">{{product.title}}</h5>
+    <p class="card-text">{{product.desc|slice:"0:30"}}..</p>  <!--showing only a part of the description in main page-->
+    <button  data-product="{{product.product_id}}"data-action="add"class="btn btn-primary update-cart">Add to cart</button>
+    <!--dynamic url routing to individual product page-->
+    <a href="/shop/productview/{{product.product_id}}"><button  id="qv{{product.product_id}}"class="btn btn-primary">Quick View</button></a> 
+  </div>
+</div>
+{% endfor %} {% endblock %}
+{% block js %}
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+
+<!-- implementing cart functionality
+<script>
+  //localStorage.removeItem('cart');   to delete cart items
+    console.log('working');
+    // Initialize cart
+    if(localStorage.getItem('cart') == null){
+        var cart = {};
+    }
+    else{
+        cart = JSON.parse(localStorage.getItem('cart'));
+        document.getElementById('cart').innerHTML=Object.keys(cart).length;//to display no of items in cart on navbar
+    }
+    $('.cart').click(function(){
+        console.log('clicked');
+        var idstr = this.id.toString();
+        console.log(idstr);
+        if (cart[idstr] !=undefined){
+          cart[idstr] = cart[idstr] + 1;
+        }
+        else
+        {
+          cart[idstr] = 1;
+        }
+        console.log(cart);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    });
+   
+</script> -->
+{% endblock %}

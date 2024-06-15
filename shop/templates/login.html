@@ -1,0 +1,18 @@
+<style>
+  h5 {
+    color: red;
+  }
+</style>
+<h1>Login</h1>
+<h3>New customer?<a href="/shop/register/">Register here</a></h3>
+{% for message in messages %}
+<h5>{{message}}</h5>
+{% endfor %}
+<form action="/shop/login/" method="POST">
+  {% csrf_token %}
+  <label for="username">username:</label>
+  <input type="text" name="username" /><br /><br />
+  <label for="password">password</label>
+  <input type="password" name="password" /><br /><br />
+  <input type="submit" />
+</form>
